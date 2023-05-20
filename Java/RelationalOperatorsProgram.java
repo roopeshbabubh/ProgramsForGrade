@@ -1,5 +1,3 @@
-package CodeInJava;
-
 import java.util.Scanner;
 
 public class RelationalOperatorsProgram {
