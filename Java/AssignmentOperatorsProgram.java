@@ -1,5 +1,3 @@
-package CodeInJava;
-
 public class AssignmentOperatorsProgram {
     public static void main(String[] args) {
         int num = 10;
