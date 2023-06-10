@@ -1,10 +1,14 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Scanner;
 
-public class LibraryCatalogApplication {
-    private final int MAX_BOOKS = 100;
+public class LibraryCatalogApplicationUsingFiles {
+    int MAX_BOOKS = 10;
     private final int BOOK_ATTRIBUTES = 5;
     private final int BOOK_ID_INDEX = 0;
     private final int BOOK_TITLE_INDEX = 1;
@@ -13,15 +17,70 @@ public class LibraryCatalogApplication {
     private final int BOOK_ISSUE_DATE_INDEX = 4;
 
     String[][] catalog = new String[MAX_BOOKS][BOOK_ATTRIBUTES];
-    int bookCount = 0;
-    {
-        // Add book data to the catalog
-        catalog[bookCount++] = new String[]{"101", "HTML and CSS", "Jon Duckett", "Available", "Null"};
-        catalog[bookCount++] = new String[]{"102", "JavaScript: The Good Parts", "Douglas C", "Available", "Null"};
-        catalog[bookCount++] = new String[]{"103", "Learning Web Design", "Jennifer N", "CP2014", "23-May-2023"};
-        catalog[bookCount++] = new String[]{"104", "Responsive Web Design", "Ben Frain", "EC3142", "17-May-2023"};
-    }
+
     Scanner scanner = new Scanner(System.in);
+    int bookCount = 0;
+
+    String headder = "Book ID,Book Title,Author,Availability,Issue Date\n";
+    String fileName = "LibraryCatalogApplicationCsvFile.csv";
+
+    {
+        try (BufferedWriter bwr = new BufferedWriter(new FileWriter(fileName))) {
+            bwr.write(headder);
+            bwr.write("101,HTML and CSS,Jon Duckett,Available,Null");
+            bwr.newLine();
+            bwr.write("102,JavaScript: The Good Parts,Douglas C,Available,Null");
+            bwr.newLine();
+            bwr.write("103,Learning Web Design,Jennifer N,CP2014,23-May-2023");
+            bwr.newLine();
+            bwr.write("104,Responsive Web Design,Ben Frain,EC3142,17-May-2023");
+            bwr.newLine();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    {
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+
+            String line = br.readLine();
+            while ((line = br.readLine()) != null) {
+                // Add book data to the catalog
+                String[] data = line.split(",");
+                for (int i = 0; i < data.length; i++) {
+                    catalog[bookCount][i] = data[i];
+                }
+                ++bookCount;
+            }
+        } catch (Exception e) {
+            System.out.println("File not found");
+
+        }
+    }
+
+    // Update data of return and issue to csv file
+    public void updateDataToCsvFile() {
+        try {
+            FileWriter writer = new FileWriter(fileName);
+
+            writer.write(headder);
+            // Write the data to the CSV file
+            for (String[] book : catalog) {
+                StringBuilder sb = new StringBuilder();
+                for (String field : book) {
+                    sb.append(field).append(",");
+                }
+                sb.deleteCharAt(sb.length() - 1); // Remove the trailing comma
+                sb.append("\n"); // Add a new line
+                writer.write(sb.toString());
+            }
+            writer.close();
+            System.out.println("Data has been written to the CSV file.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public void displayMainMenu() {
         System.out.println("-----------------------------------------------------------------------------------------");
@@ -41,7 +100,7 @@ public class LibraryCatalogApplication {
         System.out.println("-----------------------------------------------------------------------------------------");
         for (int i = 0; i < bookCount; i++) {
             for (int j = 0; j < BOOK_ATTRIBUTES; j++) {
-                if(j == BOOK_TITLE_INDEX){
+                if (j == BOOK_TITLE_INDEX) {
                     System.out.printf("%-29s", catalog[i][j]);
                     continue;
                 }
@@ -80,6 +139,7 @@ public class LibraryCatalogApplication {
         } else {
             System.out.println("Issue operation canceled.");
         }
+        updateDataToCsvFile();
     }
 
     public void returnBook() {
@@ -116,6 +176,7 @@ public class LibraryCatalogApplication {
         } else {
             System.out.println("Return operation canceled.");
         }
+        updateDataToCsvFile();
     }
 
     public int findBookIndexByID(String bookID) {
@@ -143,17 +204,17 @@ public class LibraryCatalogApplication {
             String option = scanner.next();
             scanner.nextLine(); // Consume the newline character left by next()
             System.out.println();
-                if(option.equals("1")) {
-                    displayAllBooks();
-                } else if(option.equals("2")) {
-                    issueBook();
-                } else if(option.equals("3")) {
-                    returnBook();
-                } else if(option.equals("4")) {
-                    System.out.println("Thank you for visiting  SmartPoint!");
-                    return;
-                } else {
-                    System.out.println("Invalid option!");
+            if (option.equals("1")) {
+                displayAllBooks();
+            } else if (option.equals("2")) {
+                issueBook();
+            } else if (option.equals("3")) {
+                returnBook();
+            } else if (option.equals("4")) {
+                System.out.println("Thank you for visiting  SmartPoint!");
+                return;
+            } else {
+                System.out.println("Invalid option!");
             }
             System.out.print("\nEnter \"Y\" to return to the main menu or \"N\" to Exit: ");
             choice = scanner.next();
@@ -163,7 +224,7 @@ public class LibraryCatalogApplication {
     }
 
     public static void main(String[] args) {
-        LibraryCatalogApplication libraryCatalogApplication = new LibraryCatalogApplication();
-        libraryCatalogApplication.run();
+        LibraryCatalogApplicationUsingFiles LibraryCatalogApplicationUsingFiles = new LibraryCatalogApplicationUsingFiles();
+        LibraryCatalogApplicationUsingFiles.run();
     }
 }
